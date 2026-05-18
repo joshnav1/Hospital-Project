@@ -40,7 +40,7 @@ To stop all services:
 ## Project Layout
 
 ```
-mini_project/
+Hospital-Project/
 ├── app/
 │   ├── main.py                    # FastAPI app + CORS + lifespan
 │   ├── config.py                  # Pydantic-settings (reads .env)
