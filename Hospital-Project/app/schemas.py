@@ -85,6 +85,17 @@ class TriageReport(BaseModel):
     vitals:                   Optional[VitalSigns] = None
 
 
+class LLMTriageResult(BaseModel):
+    """Validates the JSON object returned by the LLM triage prompt."""
+    triage_level:            TriageLevel
+    triage_score:            int        = Field(..., ge=1, le=10)
+    suggested_department_id: str
+    chief_complaint:         str
+    clinical_summary:        str
+    recommended_actions:     List[str]  = Field(default_factory=list)
+    red_flags:               List[str]  = Field(default_factory=list)
+
+
 class EscalateRequest(BaseModel):
     patient_id: str
     reason: str = "Manual escalation by clinical staff"

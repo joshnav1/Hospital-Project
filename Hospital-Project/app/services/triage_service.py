@@ -15,14 +15,17 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import AsyncGenerator, Dict, List, Optional, Tuple
 
-import httpx
 from fastapi import HTTPException
+from google import genai
+from google.genai import types
+from pydantic import ValidationError
 
-from app.config import settings
-from app.schemas import (
+from ..config import settings
+from ..schemas import (
     EscalateRequest,
     EscalateResponse,
     EscalationStatus,
+    LLMTriageResult,
     TriageLevel,
     TriageReport,
     TriageRequest,
@@ -273,34 +276,58 @@ def _strip_markdown_fences(text: str) -> str:
     return text.strip()
 
 
-async def _call_gemini(prompt: str) -> dict:
-    url = (
-        f"{settings.GEMINI_BASE_URL}/models/{settings.GEMINI_MODEL}"
-        f":generateContent?key={settings.GEMINI_API_KEY}"
-    )
-    payload = {
-        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-        "systemInstruction": {"parts": [{"text": _SYSTEM_PROMPT}]},
-        "generationConfig": {"maxOutputTokens": 1024, "temperature": 0.2, "topP": 0.9},
-    }
-    async with httpx.AsyncClient(timeout=25.0) as client:
-        resp = await client.post(url, json=payload)
+def _extract_json(text: str) -> dict:
+    """
+    Parse and validate the LLM's JSON output against LLMTriageResult.
+    Tries the full text first, then falls back to the outermost {…} block
+    to tolerate preamble text or markdown fences.
+    """
+    def _try_validate(candidate: str) -> dict:
+        result = LLMTriageResult.model_validate_json(candidate)
+        return result.model_dump(mode="json")
 
-    if resp.status_code != 200:
-        raise RuntimeError(f"Gemini API error {resp.status_code}: {resp.text[:200]}")
+    cleaned = _strip_markdown_fences(text)
 
-    candidates = resp.json().get("candidates", [])
-    if not candidates:
-        raise RuntimeError("Gemini returned no candidates")
-
-    text = "".join(
-        part.get("text", "")
-        for part in candidates[0].get("content", {}).get("parts", [])
-    )
     try:
-        return json.loads(_strip_markdown_fences(text))
-    except json.JSONDecodeError as exc:
-        raise RuntimeError(f"LLM returned non-JSON: {exc}. Raw: {text[:300]}")
+        return _try_validate(cleaned)
+    except (ValidationError, ValueError):
+        pass
+
+    start = cleaned.find('{')
+    end = cleaned.rfind('}')
+    if start != -1 and end > start:
+        try:
+            return _try_validate(cleaned[start:end + 1])
+        except (ValidationError, ValueError) as exc:
+            logger.error("LLM_JSON_VALIDATE_FAILED | error=%s | raw=%s", exc, repr(text[:400]))
+            raise RuntimeError(f"LLM JSON failed schema validation: {exc}") from exc
+
+    logger.error("LLM_JSON_PARSE_FAILED | raw_length=%d | raw=%s", len(text), repr(text[:400]))
+    raise RuntimeError(f"No valid JSON found in LLM output ({len(text)} chars)")
+
+
+def _get_genai_client() -> genai.Client:
+    return genai.Client(api_key=settings.GEMINI_API_KEY)
+
+
+def _genai_config() -> types.GenerateContentConfig:
+    return types.GenerateContentConfig(
+        system_instruction=_SYSTEM_PROMPT,
+        max_output_tokens=1024,
+        temperature=0.2,
+        top_p=0.9,
+    )
+
+
+async def _call_gemini(prompt: str) -> dict:
+    client = _get_genai_client()
+    response = await client.aio.models.generate_content(
+        model=settings.GEMINI_MODEL,
+        contents=prompt,
+        config=_genai_config(),
+    )
+    text = response.text or ""
+    return _extract_json(text)
 
 
 def _rule_based_fallback(req: TriageRequest) -> dict:
@@ -333,32 +360,16 @@ def _rule_based_fallback(req: TriageRequest) -> dict:
 # ─────────────────────────────────────────────────────────────────────────────
 
 async def _call_gemini_stream(prompt: str) -> AsyncGenerator[str, None]:
-    """Yields raw text chunks from Gemini's streamGenerateContent SSE endpoint."""
-    url = (
-        f"{settings.GEMINI_BASE_URL}/models/{settings.GEMINI_MODEL}"
-        f":streamGenerateContent?key={settings.GEMINI_API_KEY}&alt=sse"
+    """Yields text chunks from Gemini using the google-genai async streaming API."""
+    client = _get_genai_client()
+    stream = await client.aio.models.generate_content_stream(
+        model=settings.GEMINI_MODEL,
+        contents=prompt,
+        config=_genai_config(),
     )
-    payload = {
-        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-        "systemInstruction": {"parts": [{"text": _SYSTEM_PROMPT}]},
-        "generationConfig": {"maxOutputTokens": 1024, "temperature": 0.2, "topP": 0.9},
-    }
-    async with httpx.AsyncClient(timeout=25.0) as client:
-        async with client.stream("POST", url, json=payload) as resp:
-            if resp.status_code != 200:
-                raise RuntimeError(f"Gemini streaming error {resp.status_code}")
-            async for line in resp.aiter_lines():
-                if not line.startswith("data: ") or "[DONE]" in line:
-                    continue
-                try:
-                    chunk = json.loads(line[6:])
-                    for candidate in chunk.get("candidates", []):
-                        for part in candidate.get("content", {}).get("parts", []):
-                            text = part.get("text", "")
-                            if text:
-                                yield text
-                except json.JSONDecodeError:
-                    continue
+    async for chunk in stream:  # type: ignore[union-attr]
+        if chunk.text:
+            yield chunk.text
 
 
 def _build_report(
@@ -477,7 +488,7 @@ async def stream_triage(req: TriageRequest) -> AsyncGenerator[str, None]:
         async for chunk in _call_gemini_stream(_build_triage_prompt(req)):
             full_text += chunk
             yield f"event: reasoning\ndata: {json.dumps({'text': chunk})}\n\n"
-        llm_data = json.loads(_strip_markdown_fences(full_text))
+        llm_data = _extract_json(full_text)
     except Exception as exc:
         logger.warning("LLM stream failed — using fallback | error=%s", exc)
         llm_data = _rule_based_fallback(req)
