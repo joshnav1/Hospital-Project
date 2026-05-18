@@ -14,7 +14,7 @@ FROM python:3.12-slim AS runtime
 WORKDIR /app
 
 COPY --from=builder /install /usr/local
-COPY app/ ./app/
+COPY app ./app/
 
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 USER appuser
