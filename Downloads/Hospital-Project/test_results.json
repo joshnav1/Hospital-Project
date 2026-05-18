@@ -1,0 +1,1499 @@
+{
+  "run_at": "2026-05-18T08:11:07.348101+00:00",
+  "base_url": "http://localhost:8000",
+  "summary": {
+    "total": 27,
+    "passed": 19,
+    "failed": 8
+  },
+  "scenarios": [
+    {
+      "name": "Health check",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8000/health",
+        "payload": null
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "status": "ok",
+          "model": "gemini-2.5-flash",
+          "environment": "development"
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 200",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"status\":\"ok\"'",
+          "passed": false
+        },
+        {
+          "check": "body contains '\"model\"'",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"environment\"'",
+          "passed": true
+        }
+      ],
+      "passed": false
+    },
+    {
+      "name": "Cardiac emergency \u2192 Cardiology",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage",
+        "payload": {
+          "patient_name": "Ravi Kumar",
+          "age": 54,
+          "gender": "male",
+          "symptoms": [
+            "severe chest pain",
+            "shortness of breath"
+          ],
+          "vitals": {
+            "heart_rate_bpm": 108,
+            "temperature_celsius": 37.2
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "patient_id": "7f24be21-3915-45ea-8085-73f8e3ed075f",
+          "patient_name": "Ravi Kumar",
+          "age": 54,
+          "gender": "male",
+          "triage_level": "EMERGENCY",
+          "triage_score": 1,
+          "matched_department": "Emergency Medicine",
+          "matched_department_id": "DEPT-001",
+          "available_slots": 3,
+          "capacity_flag": false,
+          "next_best_department": null,
+          "next_best_department_id": null,
+          "estimated_wait_minutes": 0,
+          "chief_complaint": "Acute onset of severe chest pain accompanied by shortness of breath.",
+          "clinical_summary": "A 54-year-old male presents with severe chest pain and shortness of breath. Vitals indicate tachycardia with a heart rate of 108 bpm. These symptoms are highly concerning for an acute cardiac or pulmonary emergency requiring immediate assessment and intervention.",
+          "recommended_actions": [
+            "Immediate transfer to resuscitation bay",
+            "STAT 12-lead ECG",
+            "Oxygen therapy as needed",
+            "Establish IV access and draw labs including cardiac enzymes",
+            "Continuous vital sign monitoring"
+          ],
+          "red_flags": [
+            "CARDIAC_EVENT_RISK",
+            "Severe chest pain",
+            "Shortness of breath",
+            "Tachycardia (HR 108 bpm)",
+            "Age (54 years old) with acute cardiac/pulmonary symptoms"
+          ],
+          "escalated": false,
+          "escalation_reason": null,
+          "escalated_at": null,
+          "created_at": "2026-05-18T08:10:32.379168Z",
+          "updated_at": "2026-05-18T08:10:32.379168Z",
+          "llm_model_used": "gemini-2.5-flash",
+          "raw_symptoms": [
+            "severe chest pain",
+            "shortness of breath"
+          ],
+          "vitals": {
+            "heart_rate_bpm": 108,
+            "blood_pressure_systolic": null,
+            "blood_pressure_diastolic": null,
+            "temperature_celsius": 37.2,
+            "oxygen_saturation_pct": null,
+            "respiratory_rate_bpm": null
+          }
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 200",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"triage_level\":\"EMERGENCY\"'",
+          "passed": false
+        },
+        {
+          "check": "body contains 'CARDIAC_EVENT_RISK'",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"matched_department_id\":\"DEPT-002\"'",
+          "passed": false
+        }
+      ],
+      "passed": false
+    },
+    {
+      "name": "Stroke risk (FAST triad) \u2192 Emergency Medicine",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage",
+        "payload": {
+          "patient_name": "Sunil Mehta",
+          "age": 65,
+          "gender": "male",
+          "symptoms": [
+            "face drooping",
+            "arm weakness",
+            "speech difficulty"
+          ]
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "patient_id": "6834bbd3-dfbb-4990-b995-fe3b3fe35ac7",
+          "patient_name": "Sunil Mehta",
+          "age": 65,
+          "gender": "male",
+          "triage_level": "EMERGENCY",
+          "triage_score": 1,
+          "matched_department": "Emergency Medicine",
+          "matched_department_id": "DEPT-001",
+          "available_slots": 3,
+          "capacity_flag": false,
+          "next_best_department": null,
+          "next_best_department_id": null,
+          "estimated_wait_minutes": 0,
+          "chief_complaint": "Acute onset of face drooping, arm weakness, and speech difficulty concerning for stroke.",
+          "clinical_summary": "65-year-old male presenting with acute neurological deficits including facial droop, arm weakness, and speech difficulty. The duration of symptoms is unknown. These findings are highly concerning for an acute cerebrovascular accident (stroke) requiring immediate evaluation and intervention.",
+          "recommended_actions": [
+            "Activate stroke protocol immediately.",
+            "Perform rapid neurological assessment (NIHSS).",
+            "Obtain stat non-contrast head CT scan.",
+            "Prepare for potential thrombolytic therapy or endovascular intervention."
+          ],
+          "red_flags": [
+            "STROKE_RISK",
+            "Acute onset neurological deficits (face drooping, arm weakness, speech difficulty)",
+            "Suspected cerebrovascular accident (stroke)",
+            "Unknown symptom onset time"
+          ],
+          "escalated": false,
+          "escalation_reason": null,
+          "escalated_at": null,
+          "created_at": "2026-05-18T08:10:38.767748Z",
+          "updated_at": "2026-05-18T08:10:38.767748Z",
+          "llm_model_used": "gemini-2.5-flash",
+          "raw_symptoms": [
+            "face drooping",
+            "arm weakness",
+            "speech difficulty"
+          ],
+          "vitals": null
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 200",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"triage_level\":\"EMERGENCY\"'",
+          "passed": false
+        },
+        {
+          "check": "body contains 'STROKE_RISK'",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"matched_department_id\":\"DEPT-001\"'",
+          "passed": false
+        }
+      ],
+      "passed": false
+    },
+    {
+      "name": "Pediatric high fever \u2192 Pediatrics",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage",
+        "payload": {
+          "patient_name": "Arjun Singh",
+          "age": 8,
+          "gender": "male",
+          "symptoms": [
+            "fever",
+            "headache"
+          ],
+          "vitals": {
+            "temperature_celsius": 39.9
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "patient_id": "24d121d7-c436-4fc3-b3d7-4776949a0e05",
+          "patient_name": "Arjun Singh",
+          "age": 8,
+          "gender": "male",
+          "triage_level": "URGENT",
+          "triage_score": 3,
+          "matched_department": "Pediatrics",
+          "matched_department_id": "DEPT-004",
+          "available_slots": 2,
+          "capacity_flag": false,
+          "next_best_department": null,
+          "next_best_department_id": null,
+          "estimated_wait_minutes": 15,
+          "chief_complaint": "8-year-old male presenting with high fever and headache.",
+          "clinical_summary": "Arjun Singh, an 8-year-old male, presents with a high-grade fever of 39.9 C and headache. There is no known medical history or allergies, and the duration of symptoms is unknown. This presentation in a pediatric patient warrants urgent evaluation to rule out serious infectious etiologies.",
+          "recommended_actions": [
+            "Immediate medical evaluation by a pediatrician or emergency physician.",
+            "Full set of vital signs including heart rate, respiratory rate, blood pressure, and oxygen saturation.",
+            "Neurological assessment to check for signs of meningeal irritation or altered mental status.",
+            "Consideration for diagnostic workup based on clinical findings."
+          ],
+          "red_flags": [
+            "PEDIATRIC_HIGH_FEVER",
+            "High-grade fever (39.9 C) in a child",
+            "Headache accompanying fever in a child (potential for serious infection like meningitis)",
+            "Unknown duration of symptoms"
+          ],
+          "escalated": false,
+          "escalation_reason": null,
+          "escalated_at": null,
+          "created_at": "2026-05-18T08:10:43.342733Z",
+          "updated_at": "2026-05-18T08:10:43.342733Z",
+          "llm_model_used": "gemini-2.5-flash",
+          "raw_symptoms": [
+            "fever",
+            "headache"
+          ],
+          "vitals": {
+            "heart_rate_bpm": null,
+            "blood_pressure_systolic": null,
+            "blood_pressure_diastolic": null,
+            "temperature_celsius": 39.9,
+            "oxygen_saturation_pct": null,
+            "respiratory_rate_bpm": null
+          }
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 200",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"triage_level\":\"URGENT\"'",
+          "passed": false
+        },
+        {
+          "check": "body contains 'PEDIATRIC_HIGH_FEVER'",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"matched_department_id\":\"DEPT-004\"'",
+          "passed": false
+        }
+      ],
+      "passed": false
+    },
+    {
+      "name": "Standard presentation \u2014 mild symptoms",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage",
+        "payload": {
+          "patient_name": "Priya Sharma",
+          "age": 35,
+          "gender": "female",
+          "symptoms": [
+            "mild headache",
+            "fatigue"
+          ],
+          "symptom_duration_hours": 4
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "patient_id": "5b82bf81-83b4-49ca-a838-7f78a1d4ce2d",
+          "patient_name": "Priya Sharma",
+          "age": 35,
+          "gender": "female",
+          "triage_level": "STANDARD",
+          "triage_score": 6,
+          "matched_department": "General Practice",
+          "matched_department_id": "DEPT-003",
+          "available_slots": 5,
+          "capacity_flag": false,
+          "next_best_department": null,
+          "next_best_department_id": null,
+          "estimated_wait_minutes": 45,
+          "chief_complaint": "Rule-based assessment (LLM unavailable)",
+          "clinical_summary": "Automated rule-based triage performed; LLM service was unreachable.",
+          "recommended_actions": [
+            "Assess vital signs",
+            "Assign to department",
+            "Re-evaluate if condition changes"
+          ],
+          "red_flags": [],
+          "escalated": false,
+          "escalation_reason": null,
+          "escalated_at": null,
+          "created_at": "2026-05-18T08:10:50.531426Z",
+          "updated_at": "2026-05-18T08:10:50.531426Z",
+          "llm_model_used": "rule-based-fallback",
+          "raw_symptoms": [
+            "mild headache",
+            "fatigue"
+          ],
+          "vitals": null
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 200",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"patient_id\"'",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"triage_level\"'",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"matched_department\"'",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"clinical_summary\"'",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"recommended_actions\"'",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Full payload \u2014 vitals + history + medications + notes",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage",
+        "payload": {
+          "patient_name": "Meena Patel",
+          "age": 48,
+          "gender": "female",
+          "symptoms": [
+            "chest tightness",
+            "dizziness"
+          ],
+          "symptom_duration_hours": 1,
+          "medical_history": [
+            "hypertension",
+            "type 2 diabetes"
+          ],
+          "current_medications": [
+            "metformin",
+            "amlodipine"
+          ],
+          "allergies": [
+            "penicillin"
+          ],
+          "vitals": {
+            "temperature_celsius": 37.0,
+            "heart_rate_bpm": 95,
+            "blood_pressure_systolic": 158,
+            "oxygen_saturation_pct": 96.0
+          },
+          "notes": "Patient appears anxious, symptoms started after climbing stairs"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "patient_id": "3b570fcc-a45e-4c31-b6da-041fc338764a",
+          "patient_name": "Meena Patel",
+          "age": 48,
+          "gender": "female",
+          "triage_level": "STANDARD",
+          "triage_score": 6,
+          "matched_department": "General Practice",
+          "matched_department_id": "DEPT-003",
+          "available_slots": 5,
+          "capacity_flag": false,
+          "next_best_department": null,
+          "next_best_department_id": null,
+          "estimated_wait_minutes": 45,
+          "chief_complaint": "Rule-based assessment (LLM unavailable)",
+          "clinical_summary": "Automated rule-based triage performed; LLM service was unreachable.",
+          "recommended_actions": [
+            "Assess vital signs",
+            "Assign to department",
+            "Re-evaluate if condition changes"
+          ],
+          "red_flags": [],
+          "escalated": false,
+          "escalation_reason": null,
+          "escalated_at": null,
+          "created_at": "2026-05-18T08:10:52.340642Z",
+          "updated_at": "2026-05-18T08:10:52.340642Z",
+          "llm_model_used": "rule-based-fallback",
+          "raw_symptoms": [
+            "chest tightness",
+            "dizziness"
+          ],
+          "vitals": {
+            "heart_rate_bpm": 95,
+            "blood_pressure_systolic": 158,
+            "blood_pressure_diastolic": null,
+            "temperature_celsius": 37.0,
+            "oxygen_saturation_pct": 96.0,
+            "respiratory_rate_bpm": null
+          }
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 200",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"triage_score\"'",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"estimated_wait_minutes\"'",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Self-care \u2014 minor cold symptoms",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage",
+        "payload": {
+          "patient_name": "Karan Desai",
+          "age": 28,
+          "gender": "male",
+          "symptoms": [
+            "runny nose",
+            "sore throat"
+          ],
+          "symptom_duration_hours": 24
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "patient_id": "500da8c6-4d84-483a-bd51-2618cfad655d",
+          "patient_name": "Karan Desai",
+          "age": 28,
+          "gender": "male",
+          "triage_level": "STANDARD",
+          "triage_score": 7,
+          "matched_department": "General Practice",
+          "matched_department_id": "DEPT-003",
+          "available_slots": 5,
+          "capacity_flag": false,
+          "next_best_department": null,
+          "next_best_department_id": null,
+          "estimated_wait_minutes": 45,
+          "chief_complaint": "24-hour history of runny nose and sore throat.",
+          "clinical_summary": "A 28-year-old male presents with a 24-hour history of runny nose and sore throat. He has no significant past medical history, medications, or allergies. These symptoms are consistent with a common viral upper respiratory infection, and without further concerning signs or symptoms, it is considered a non-urgent presentation.",
+          "recommended_actions": [
+            "Advise symptomatic relief with over-the-counter medications (e.g., analgesics, decongestants).",
+            "Encourage hydration and rest.",
+            "Educate on monitoring for worsening symptoms such as fever, difficulty breathing, or severe pain, which would warrant re-evaluation."
+          ],
+          "red_flags": [],
+          "escalated": false,
+          "escalation_reason": null,
+          "escalated_at": null,
+          "created_at": "2026-05-18T08:10:58.874762Z",
+          "updated_at": "2026-05-18T08:10:58.874762Z",
+          "llm_model_used": "gemini-2.5-flash",
+          "raw_symptoms": [
+            "runny nose",
+            "sore throat"
+          ],
+          "vitals": null
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 200",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"triage_level\"'",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Empty symptoms list",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage",
+        "payload": {
+          "patient_name": "Test",
+          "age": 25,
+          "gender": "male",
+          "symptoms": []
+        }
+      },
+      "response": {
+        "status": 422,
+        "body": {
+          "detail": [
+            {
+              "type": "too_short",
+              "loc": [
+                "body",
+                "symptoms"
+              ],
+              "msg": "List should have at least 1 item after validation, not 0",
+              "input": [],
+              "ctx": {
+                "field_type": "List",
+                "min_length": 1,
+                "actual_length": 0
+              }
+            }
+          ]
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 422",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"detail\"'",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Missing symptoms field",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage",
+        "payload": {
+          "patient_name": "Test",
+          "age": 25,
+          "gender": "male"
+        }
+      },
+      "response": {
+        "status": 422,
+        "body": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "symptoms"
+              ],
+              "msg": "Field required",
+              "input": {
+                "patient_name": "Test",
+                "age": 25,
+                "gender": "male"
+              }
+            }
+          ]
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 422",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Missing patient_name",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage",
+        "payload": {
+          "age": 25,
+          "gender": "male",
+          "symptoms": [
+            "headache"
+          ]
+        }
+      },
+      "response": {
+        "status": 422,
+        "body": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "patient_name"
+              ],
+              "msg": "Field required",
+              "input": {
+                "age": 25,
+                "gender": "male",
+                "symptoms": [
+                  "headache"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 422",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Invalid gender value",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage",
+        "payload": {
+          "patient_name": "Test",
+          "age": 25,
+          "gender": "robot",
+          "symptoms": [
+            "headache"
+          ]
+        }
+      },
+      "response": {
+        "status": 422,
+        "body": {
+          "detail": [
+            {
+              "type": "string_pattern_mismatch",
+              "loc": [
+                "body",
+                "gender"
+              ],
+              "msg": "String should match pattern '^(male|female|other)$'",
+              "input": "robot",
+              "ctx": {
+                "pattern": "^(male|female|other)$"
+              }
+            }
+          ]
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 422",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Age out of range (200)",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage",
+        "payload": {
+          "patient_name": "Test",
+          "age": 200,
+          "gender": "male",
+          "symptoms": [
+            "headache"
+          ]
+        }
+      },
+      "response": {
+        "status": 422,
+        "body": {
+          "detail": [
+            {
+              "type": "less_than_equal",
+              "loc": [
+                "body",
+                "age"
+              ],
+              "msg": "Input should be less than or equal to 130",
+              "input": 200,
+              "ctx": {
+                "le": 130
+              }
+            }
+          ]
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 422",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Negative age (-1)",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage",
+        "payload": {
+          "patient_name": "Test",
+          "age": -1,
+          "gender": "male",
+          "symptoms": [
+            "headache"
+          ]
+        }
+      },
+      "response": {
+        "status": 422,
+        "body": {
+          "detail": [
+            {
+              "type": "greater_than_equal",
+              "loc": [
+                "body",
+                "age"
+              ],
+              "msg": "Input should be greater than or equal to 0",
+              "input": -1,
+              "ctx": {
+                "ge": 0
+              }
+            }
+          ]
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 422",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Empty request body",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage",
+        "payload": {}
+      },
+      "response": {
+        "status": 422,
+        "body": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "patient_name"
+              ],
+              "msg": "Field required",
+              "input": {}
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "age"
+              ],
+              "msg": "Field required",
+              "input": {}
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "gender"
+              ],
+              "msg": "Field required",
+              "input": {}
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "symptoms"
+              ],
+              "msg": "Field required",
+              "input": {}
+            }
+          ]
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 422",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Cardiac \u2014 all 4 SSE event types",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage/stream",
+        "payload": {
+          "patient_name": "Stream Cardiac",
+          "age": 60,
+          "gender": "male",
+          "symptoms": [
+            "chest pain",
+            "shortness of breath"
+          ]
+        }
+      },
+      "response": {
+        "status": 200,
+        "body_raw": "event: start\ndata: {\"patient_id\": \"cd445017-d990-45a9-bea4-aebdb88d59bb\"}\n\nevent: red_flags\ndata: {\"flags\": [\"CARDIAC_EVENT_RISK\"], \"override_level\": \"EMERGENCY\"}\n\nevent: complete\ndata: {\"patient_id\": \"cd445017-d990-45a9-bea4-aebdb88d59bb\", \"patient_name\": \"Stream Cardiac\", \"age\": 60, \"gender\": \"male\", \"triage_level\": \"EMERGENCY\", \"triage_score\": 2, \"matched_department\": \"Emergency Medicine\", \"matched_department_id\": \"DEPT-001\", \"available_slots\": 3, \"capacity_flag\": false, \"next_best_department\": null, \"next_best_department_id\": null, \"estimated_wait_minutes\": 0, \"chief_complaint\": \"Rule-based assessment (LLM unavailable)\", \"clinical_summary\": \"Automated rule-based triage performed; LLM service was unreachable.\", \"recommended_actions\": [\"Assess vital signs\", \"Assign to department\", \"Re-evaluate if condition changes\"], \"red_flags\": [\"CARDIAC_EVENT_RISK\"], \"escalated\": false, \"escalation_reason\": null, \"escalated_at\": null, \"created_at\": \"2026-05-18T08:11:04.948545Z\", \"updated_at\": \"2026-05-18T08:11:04.948545Z\", \"llm_model_used\": \"rule-based-fallback\", \"raw_symptoms\": [\"chest pain\", \"shortness of breath\"], \"vitals\": null}\n\n",
+        "events": [
+          {
+            "event": "start",
+            "data": {
+              "patient_id": "cd445017-d990-45a9-bea4-aebdb88d59bb"
+            }
+          },
+          {
+            "event": "red_flags",
+            "data": {
+              "flags": [
+                "CARDIAC_EVENT_RISK"
+              ],
+              "override_level": "EMERGENCY"
+            }
+          },
+          {
+            "event": "complete",
+            "data": {
+              "patient_id": "cd445017-d990-45a9-bea4-aebdb88d59bb",
+              "patient_name": "Stream Cardiac",
+              "age": 60,
+              "gender": "male",
+              "triage_level": "EMERGENCY",
+              "triage_score": 2,
+              "matched_department": "Emergency Medicine",
+              "matched_department_id": "DEPT-001",
+              "available_slots": 3,
+              "capacity_flag": false,
+              "next_best_department": null,
+              "next_best_department_id": null,
+              "estimated_wait_minutes": 0,
+              "chief_complaint": "Rule-based assessment (LLM unavailable)",
+              "clinical_summary": "Automated rule-based triage performed; LLM service was unreachable.",
+              "recommended_actions": [
+                "Assess vital signs",
+                "Assign to department",
+                "Re-evaluate if condition changes"
+              ],
+              "red_flags": [
+                "CARDIAC_EVENT_RISK"
+              ],
+              "escalated": false,
+              "escalation_reason": null,
+              "escalated_at": null,
+              "created_at": "2026-05-18T08:11:04.948545Z",
+              "updated_at": "2026-05-18T08:11:04.948545Z",
+              "llm_model_used": "rule-based-fallback",
+              "raw_symptoms": [
+                "chest pain",
+                "shortness of breath"
+              ],
+              "vitals": null
+            }
+          }
+        ]
+      },
+      "assertions": [
+        {
+          "check": "HTTP 200",
+          "passed": true
+        },
+        {
+          "check": "SSE event 'start' present",
+          "passed": true
+        },
+        {
+          "check": "SSE event 'red_flags' present",
+          "passed": true
+        },
+        {
+          "check": "SSE event 'reasoning' present",
+          "passed": false
+        },
+        {
+          "check": "SSE event 'complete' present",
+          "passed": true
+        },
+        {
+          "check": "body contains 'CARDIAC_EVENT_RISK'",
+          "passed": true
+        }
+      ],
+      "passed": false
+    },
+    {
+      "name": "Standard \u2014 start + reasoning + complete (no red_flags)",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage/stream",
+        "payload": {
+          "patient_name": "Stream Standard",
+          "age": 30,
+          "gender": "female",
+          "symptoms": [
+            "mild back pain"
+          ]
+        }
+      },
+      "response": {
+        "status": 200,
+        "body_raw": "event: start\ndata: {\"patient_id\": \"2547fdd6-3f92-4185-bfb2-0e855181cbe4\"}\n\nevent: complete\ndata: {\"patient_id\": \"2547fdd6-3f92-4185-bfb2-0e855181cbe4\", \"patient_name\": \"Stream Standard\", \"age\": 30, \"gender\": \"female\", \"triage_level\": \"STANDARD\", \"triage_score\": 6, \"matched_department\": \"General Practice\", \"matched_department_id\": \"DEPT-003\", \"available_slots\": 5, \"capacity_flag\": false, \"next_best_department\": null, \"next_best_department_id\": null, \"estimated_wait_minutes\": 45, \"chief_complaint\": \"Rule-based assessment (LLM unavailable)\", \"clinical_summary\": \"Automated rule-based triage performed; LLM service was unreachable.\", \"recommended_actions\": [\"Assess vital signs\", \"Assign to department\", \"Re-evaluate if condition changes\"], \"red_flags\": [], \"escalated\": false, \"escalation_reason\": null, \"escalated_at\": null, \"created_at\": \"2026-05-18T08:11:05.868839Z\", \"updated_at\": \"2026-05-18T08:11:05.868839Z\", \"llm_model_used\": \"rule-based-fallback\", \"raw_symptoms\": [\"mild back pain\"], \"vitals\": null}\n\n",
+        "events": [
+          {
+            "event": "start",
+            "data": {
+              "patient_id": "2547fdd6-3f92-4185-bfb2-0e855181cbe4"
+            }
+          },
+          {
+            "event": "complete",
+            "data": {
+              "patient_id": "2547fdd6-3f92-4185-bfb2-0e855181cbe4",
+              "patient_name": "Stream Standard",
+              "age": 30,
+              "gender": "female",
+              "triage_level": "STANDARD",
+              "triage_score": 6,
+              "matched_department": "General Practice",
+              "matched_department_id": "DEPT-003",
+              "available_slots": 5,
+              "capacity_flag": false,
+              "next_best_department": null,
+              "next_best_department_id": null,
+              "estimated_wait_minutes": 45,
+              "chief_complaint": "Rule-based assessment (LLM unavailable)",
+              "clinical_summary": "Automated rule-based triage performed; LLM service was unreachable.",
+              "recommended_actions": [
+                "Assess vital signs",
+                "Assign to department",
+                "Re-evaluate if condition changes"
+              ],
+              "red_flags": [],
+              "escalated": false,
+              "escalation_reason": null,
+              "escalated_at": null,
+              "created_at": "2026-05-18T08:11:05.868839Z",
+              "updated_at": "2026-05-18T08:11:05.868839Z",
+              "llm_model_used": "rule-based-fallback",
+              "raw_symptoms": [
+                "mild back pain"
+              ],
+              "vitals": null
+            }
+          }
+        ]
+      },
+      "assertions": [
+        {
+          "check": "HTTP 200",
+          "passed": true
+        },
+        {
+          "check": "SSE event 'start' present",
+          "passed": true
+        },
+        {
+          "check": "SSE event 'complete' present",
+          "passed": true
+        },
+        {
+          "check": "body does not contain 'event: red_flags'",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Pediatric stream \u2014 red_flags event fired",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage/stream",
+        "payload": {
+          "patient_name": "Stream Child",
+          "age": 6,
+          "gender": "male",
+          "symptoms": [
+            "fever",
+            "cough"
+          ],
+          "vitals": {
+            "temperature_celsius": 39.5
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "body_raw": "event: start\ndata: {\"patient_id\": \"73cf9e52-1a4c-4fae-9b2e-add82230a34e\"}\n\nevent: red_flags\ndata: {\"flags\": [\"PEDIATRIC_HIGH_FEVER\"], \"override_level\": \"URGENT\"}\n\nevent: complete\ndata: {\"patient_id\": \"73cf9e52-1a4c-4fae-9b2e-add82230a34e\", \"patient_name\": \"Stream Child\", \"age\": 6, \"gender\": \"male\", \"triage_level\": \"URGENT\", \"triage_score\": 4, \"matched_department\": \"Pediatrics\", \"matched_department_id\": \"DEPT-004\", \"available_slots\": 2, \"capacity_flag\": false, \"next_best_department\": null, \"next_best_department_id\": null, \"estimated_wait_minutes\": 15, \"chief_complaint\": \"Rule-based assessment (LLM unavailable)\", \"clinical_summary\": \"Automated rule-based triage performed; LLM service was unreachable.\", \"recommended_actions\": [\"Assess vital signs\", \"Assign to department\", \"Re-evaluate if condition changes\"], \"red_flags\": [\"PEDIATRIC_HIGH_FEVER\"], \"escalated\": false, \"escalation_reason\": null, \"escalated_at\": null, \"created_at\": \"2026-05-18T08:11:06.481050Z\", \"updated_at\": \"2026-05-18T08:11:06.481050Z\", \"llm_model_used\": \"rule-based-fallback\", \"raw_symptoms\": [\"fever\", \"cough\"], \"vitals\": {\"heart_rate_bpm\": null, \"blood_pressure_systolic\": null, \"blood_pressure_diastolic\": null, \"temperature_celsius\": 39.5, \"oxygen_saturation_pct\": null, \"respiratory_rate_bpm\": null}}\n\n",
+        "events": [
+          {
+            "event": "start",
+            "data": {
+              "patient_id": "73cf9e52-1a4c-4fae-9b2e-add82230a34e"
+            }
+          },
+          {
+            "event": "red_flags",
+            "data": {
+              "flags": [
+                "PEDIATRIC_HIGH_FEVER"
+              ],
+              "override_level": "URGENT"
+            }
+          },
+          {
+            "event": "complete",
+            "data": {
+              "patient_id": "73cf9e52-1a4c-4fae-9b2e-add82230a34e",
+              "patient_name": "Stream Child",
+              "age": 6,
+              "gender": "male",
+              "triage_level": "URGENT",
+              "triage_score": 4,
+              "matched_department": "Pediatrics",
+              "matched_department_id": "DEPT-004",
+              "available_slots": 2,
+              "capacity_flag": false,
+              "next_best_department": null,
+              "next_best_department_id": null,
+              "estimated_wait_minutes": 15,
+              "chief_complaint": "Rule-based assessment (LLM unavailable)",
+              "clinical_summary": "Automated rule-based triage performed; LLM service was unreachable.",
+              "recommended_actions": [
+                "Assess vital signs",
+                "Assign to department",
+                "Re-evaluate if condition changes"
+              ],
+              "red_flags": [
+                "PEDIATRIC_HIGH_FEVER"
+              ],
+              "escalated": false,
+              "escalation_reason": null,
+              "escalated_at": null,
+              "created_at": "2026-05-18T08:11:06.481050Z",
+              "updated_at": "2026-05-18T08:11:06.481050Z",
+              "llm_model_used": "rule-based-fallback",
+              "raw_symptoms": [
+                "fever",
+                "cough"
+              ],
+              "vitals": {
+                "heart_rate_bpm": null,
+                "blood_pressure_systolic": null,
+                "blood_pressure_diastolic": null,
+                "temperature_celsius": 39.5,
+                "oxygen_saturation_pct": null,
+                "respiratory_rate_bpm": null
+              }
+            }
+          }
+        ]
+      },
+      "assertions": [
+        {
+          "check": "HTTP 200",
+          "passed": true
+        },
+        {
+          "check": "SSE event 'red_flags' present",
+          "passed": true
+        },
+        {
+          "check": "body contains 'PEDIATRIC_HIGH_FEVER'",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Stream \u2014 422 on empty symptoms",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage/stream",
+        "payload": {
+          "patient_name": "Bad",
+          "age": 25,
+          "gender": "male",
+          "symptoms": []
+        }
+      },
+      "response": {
+        "status": 422,
+        "body": {
+          "detail": [
+            {
+              "type": "too_short",
+              "loc": [
+                "body",
+                "symptoms"
+              ],
+              "msg": "List should have at least 1 item after validation, not 0",
+              "input": [],
+              "ctx": {
+                "field_type": "List",
+                "min_length": 1,
+                "actual_length": 0
+              }
+            }
+          ]
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 422",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Stream \u2014 422 on invalid gender",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/triage/stream",
+        "payload": {
+          "patient_name": "Bad",
+          "age": 25,
+          "gender": "robot",
+          "symptoms": [
+            "headache"
+          ]
+        }
+      },
+      "response": {
+        "status": 422,
+        "body": {
+          "detail": [
+            {
+              "type": "string_pattern_mismatch",
+              "loc": [
+                "body",
+                "gender"
+              ],
+              "msg": "String should match pattern '^(male|female|other)$'",
+              "input": "robot",
+              "ctx": {
+                "pattern": "^(male|female|other)$"
+              }
+            }
+          ]
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 422",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Get existing report (blocking)",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8000/report/5b82bf81-83b4-49ca-a838-7f78a1d4ce2d",
+        "payload": null
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "patient_id": "5b82bf81-83b4-49ca-a838-7f78a1d4ce2d",
+          "patient_name": "Priya Sharma",
+          "age": 35,
+          "gender": "female",
+          "triage_level": "STANDARD",
+          "triage_score": 6,
+          "matched_department": "General Practice",
+          "matched_department_id": "DEPT-003",
+          "available_slots": 5,
+          "capacity_flag": false,
+          "next_best_department": null,
+          "next_best_department_id": null,
+          "estimated_wait_minutes": 45,
+          "chief_complaint": "Rule-based assessment (LLM unavailable)",
+          "clinical_summary": "Automated rule-based triage performed; LLM service was unreachable.",
+          "recommended_actions": [
+            "Assess vital signs",
+            "Assign to department",
+            "Re-evaluate if condition changes"
+          ],
+          "red_flags": [],
+          "escalated": false,
+          "escalation_reason": null,
+          "escalated_at": null,
+          "created_at": "2026-05-18T08:10:50.531426Z",
+          "updated_at": "2026-05-18T08:10:50.531426Z",
+          "llm_model_used": "rule-based-fallback",
+          "raw_symptoms": [
+            "mild headache",
+            "fatigue"
+          ],
+          "vitals": null
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 200",
+          "passed": true
+        },
+        {
+          "check": "body contains '5b82bf81-83b4-49ca-a838-7f78a1d4ce2d'",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Get report \u2014 unknown ID \u2192 404",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8000/report/00000000-0000-0000-0000-000000000000",
+        "payload": null
+      },
+      "response": {
+        "status": 404,
+        "body": {
+          "detail": "No triage report found for patient_id '00000000-0000-0000-0000-000000000000'."
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 404",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Get report \u2014 malformed ID \u2192 404",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8000/report/not-a-real-id",
+        "payload": null
+      },
+      "response": {
+        "status": 404,
+        "body": {
+          "detail": "No triage report found for patient_id 'not-a-real-id'."
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 404",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Escalate standard patient \u2192 EMERGENCY",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/escalate",
+        "payload": {
+          "patient_id": "5b82bf81-83b4-49ca-a838-7f78a1d4ce2d",
+          "reason": "Rapid deterioration observed by staff"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "patient_id": "5b82bf81-83b4-49ca-a838-7f78a1d4ce2d",
+          "previous_triage_level": "STANDARD",
+          "new_triage_level": "EMERGENCY",
+          "matched_department": "Emergency Medicine",
+          "matched_department_id": "DEPT-001",
+          "available_slots": 3,
+          "estimated_wait_minutes": 0,
+          "escalated_at": "2026-05-18T08:11:07.325556Z",
+          "message": "Patient 'Priya Sharma' escalated from STANDARD to EMERGENCY. Immediate attention required."
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 200",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"matched_department_id\":\"DEPT-001\"'",
+          "passed": false
+        },
+        {
+          "check": "body contains '5b82bf81-83b4-49ca-a838-7f78a1d4ce2d'",
+          "passed": true
+        }
+      ],
+      "passed": false
+    },
+    {
+      "name": "Escalated report now shows EMERGENCY + escalated=true",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8000/report/5b82bf81-83b4-49ca-a838-7f78a1d4ce2d",
+        "payload": null
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "patient_id": "5b82bf81-83b4-49ca-a838-7f78a1d4ce2d",
+          "patient_name": "Priya Sharma",
+          "age": 35,
+          "gender": "female",
+          "triage_level": "EMERGENCY",
+          "triage_score": 1,
+          "matched_department": "Emergency Medicine",
+          "matched_department_id": "DEPT-001",
+          "available_slots": 3,
+          "capacity_flag": false,
+          "next_best_department": null,
+          "next_best_department_id": null,
+          "estimated_wait_minutes": 0,
+          "chief_complaint": "Rule-based assessment (LLM unavailable)",
+          "clinical_summary": "Automated rule-based triage performed; LLM service was unreachable.",
+          "recommended_actions": [
+            "Assess vital signs",
+            "Assign to department",
+            "Re-evaluate if condition changes"
+          ],
+          "red_flags": [
+            "MANUALLY_ESCALATED: Rapid deterioration observed by staff"
+          ],
+          "escalated": true,
+          "escalation_reason": "Rapid deterioration observed by staff",
+          "escalated_at": "2026-05-18T08:11:07.325556Z",
+          "created_at": "2026-05-18T08:10:50.531426Z",
+          "updated_at": "2026-05-18T08:11:07.325556Z",
+          "llm_model_used": "rule-based-fallback",
+          "raw_symptoms": [
+            "mild headache",
+            "fatigue"
+          ],
+          "vitals": null
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 200",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"triage_level\":\"EMERGENCY\"'",
+          "passed": false
+        },
+        {
+          "check": "body contains '\"escalated\":true'",
+          "passed": false
+        }
+      ],
+      "passed": false
+    },
+    {
+      "name": "Escalate unknown patient \u2192 404",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/escalate",
+        "payload": {
+          "patient_id": "00000000-0000-0000-0000-000000000000",
+          "reason": "Test"
+        }
+      },
+      "response": {
+        "status": 404,
+        "body": {
+          "detail": "No triage report found for patient_id '00000000-0000-0000-0000-000000000000'."
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 404",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Get escalation status \u2014 escalated patient",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8000/escalate/5b82bf81-83b4-49ca-a838-7f78a1d4ce2d",
+        "payload": null
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "patient_id": "5b82bf81-83b4-49ca-a838-7f78a1d4ce2d",
+          "escalated": true,
+          "triage_level": "EMERGENCY",
+          "escalation_reason": "Rapid deterioration observed by staff",
+          "escalated_at": "2026-05-18T08:11:07.325556Z"
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 200",
+          "passed": true
+        },
+        {
+          "check": "body contains '\"escalated\":true'",
+          "passed": false
+        },
+        {
+          "check": "body contains '\"triage_level\":\"EMERGENCY\"'",
+          "passed": false
+        }
+      ],
+      "passed": false
+    },
+    {
+      "name": "Get escalation status \u2014 unknown ID \u2192 404",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8000/escalate/00000000-0000-0000-0000-000000000000",
+        "payload": null
+      },
+      "response": {
+        "status": 404,
+        "body": {
+          "detail": "No triage report found for patient_id '00000000-0000-0000-0000-000000000000'."
+        }
+      },
+      "assertions": [
+        {
+          "check": "HTTP 404",
+          "passed": true
+        }
+      ],
+      "passed": true
+    }
+  ]
+}
